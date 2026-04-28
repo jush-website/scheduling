@@ -89,18 +89,18 @@ export const MonthView: React.FC<MonthViewProps> = ({
                         e.stopPropagation();
                         onEventClick(event);
                       }}
-                      className={`relative px-1.5 py-0.5 text-[8px] font-black rounded-md truncate transition-all ${colorClass} ${
-                        !isStart && !isEnd ? 'rounded-none' : ''
+                      className={`relative px-1.5 h-5 flex items-center text-[8px] font-black truncate transition-all ${colorClass} ${
+                        !isStart && !isEnd ? 'rounded-none' : 'rounded-md'
                       } ${isStart ? 'rounded-r-none' : ''} ${isEnd ? 'rounded-l-none' : ''}`}
                     >
                       {(isStart || (idx % 7 === 0)) && (
-                        <span className="flex items-center gap-1">
+                        <span className="flex items-center gap-1 z-20">
                           {isCompletedOnThisDay && <span className="w-1 h-1 bg-emerald-500 rounded-full" />}
                           {event.title}
                         </span>
                       )}
-                      {/* 背景區間線條 */}
-                      <div className={`absolute inset-y-0 -left-2 -right-2 ${barClass} -z-10`} />
+                      {/* 背景區間線條 - 統一高度與對齊 */}
+                      <div className={`absolute inset-y-0 -left-1 -right-1 ${barClass} -z-10`} />
                     </div>
                   );
                 })}
