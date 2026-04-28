@@ -6,7 +6,7 @@ export const Header: React.FC = () => {
   const { user, logout } = useAuth();
 
   return (
-    <header className="glass sticky top-0 z-50 border-b border-white/20 shadow-sm">
+    <header className="glass sticky top-0 z-50 border-b border-white/20 shadow-sm hidden md:block">
       <div className="container mx-auto px-6 h-20 flex items-center justify-between">
         <div className="flex items-center gap-3 group cursor-pointer">
           <div className="bg-gradient-to-br from-indigo-500 to-violet-600 p-2.5 rounded-2xl shadow-lg shadow-indigo-200 group-hover:scale-110 transition-transform">

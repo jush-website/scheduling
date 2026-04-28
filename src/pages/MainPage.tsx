@@ -8,10 +8,12 @@ import { EventForm } from '../components/form/EventForm';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import type { CalendarEvent } from '../types';
 import { format, addMonths, subMonths } from '../utils/date';
-import { ChevronLeft, ChevronRight, X, Plus, Calendar as CalendarIcon, Loader2, AlertCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Plus, Calendar as CalendarIcon, Loader2, AlertCircle, Settings, LogOut, User as UserIcon } from 'lucide-react';
 import { useEvents } from '../hooks/useEvents';
+import { useAuth } from '../context/AuthContext';
 
 export const MainPage: React.FC = () => {
+  const { user, logout } = useAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
   const { events, loading: eventsLoading, error: eventsError, addEvent, updateEvent, deleteEvent, toggleComplete } = useEvents();
   
@@ -22,6 +24,7 @@ export const MainPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showMobileCalendar, setShowMobileCalendar] = useState(false);
   const [showDayEvents, setShowDayEvents] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
   const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
@@ -43,11 +46,15 @@ export const MainPage: React.FC = () => {
   const handleEditEvent = (event: CalendarEvent) => {
     setEditingEvent(event);
     setIsFormOpen(true);
+    // 編輯時如果當日計畫視窗開著，先關掉
+    setShowDayEvents(false);
   };
 
   const handleConfirmDelete = (event: CalendarEvent) => {
     setEventToDelete(event);
     setIsDeleteModalOpen(true);
+    // 刪除時如果當日計畫視窗開著，先關掉
+    setShowDayEvents(false);
   };
 
   const handleSubmit = async (formData: any) => {
@@ -86,6 +93,7 @@ export const MainPage: React.FC = () => {
     setIsDeleteModalOpen(false);
     setShowMobileCalendar(false);
     setShowDayEvents(false);
+    setShowSettings(false);
     setEditingEvent(null);
   };
 
@@ -96,36 +104,64 @@ export const MainPage: React.FC = () => {
   const selectedDateEvents = events.filter(e => e.targetDate === format(currentDate, 'yyyy-MM-dd'));
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-slate-50/50">
       <Header />
       <OfflineBanner />
 
-      <main className="flex-1 container mx-auto px-6 py-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
-          <div className="space-y-1">
-            <div className="flex items-center gap-4">
-              <div className="flex items-baseline gap-1">
-                <span className="text-6xl md:text-7xl font-black tracking-tighter text-slate-900 leading-none">
-                  {format(currentDate, 'MM')}
-                </span>
-                <span className="text-4xl md:text-5xl font-black tracking-tighter text-indigo-500 leading-none">
-                  {format(currentDate, 'dd')}
-                </span>
+      <main className="flex-1 container mx-auto px-4 md:px-6 py-6 md:py-8 max-w-7xl">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-10 md:mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
+          <div className="space-y-1 relative">
+            <div className="flex items-center justify-between md:justify-start gap-4">
+              <div className="flex items-center gap-4">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-6xl md:text-7xl font-black tracking-tighter text-slate-900 leading-none">
+                    {format(currentDate, 'MM')}
+                  </span>
+                  <span className="text-4xl md:text-5xl font-black tracking-tighter text-indigo-500 leading-none">
+                    {format(currentDate, 'dd')}
+                  </span>
+                </div>
+                <div className="flex flex-col border-l-4 border-indigo-500 pl-4 py-1">
+                  <span className="text-2xl font-black text-slate-800 leading-none">{format(currentDate, 'yyyy')}</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-500 mt-1">計畫視圖</span>
+                </div>
               </div>
-              <div className="flex flex-col border-l-4 border-indigo-500 pl-4 py-1">
-                <span className="text-2xl font-black text-slate-800 leading-none">{format(currentDate, 'yyyy')}</span>
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-500 mt-1">計畫視圖</span>
+
+              {/* Mobile Settings Gear */}
+              <div className="md:hidden relative">
+                <button 
+                  onClick={() => setShowSettings(!showSettings)}
+                  className="p-3 bg-white border border-slate-100 rounded-2xl text-slate-400 shadow-sm active:scale-95 transition-all"
+                >
+                  <Settings className="w-6 h-6" />
+                </button>
+                
+                {showSettings && (
+                  <div className="absolute right-0 mt-3 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 z-[70] animate-in zoom-in-95 duration-200">
+                    <div className="px-4 py-3 border-b border-slate-50 mb-1">
+                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest">目前使用者</p>
+                      <p className="text-sm font-bold text-slate-700 truncate">{user?.displayName}</p>
+                    </div>
+                    <button 
+                      onClick={logout}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors font-bold text-sm"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      登出系統
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <button 
               onClick={() => setShowMobileCalendar(true)}
-              className="xl:hidden p-3 bg-white border border-slate-200 rounded-2xl text-slate-500 shadow-sm transition-all active:scale-95 flex items-center gap-2 font-bold text-sm"
+              className="flex-1 md:flex-none p-4 bg-white border border-slate-100 rounded-2xl text-slate-700 shadow-sm transition-all active:scale-95 flex items-center justify-center gap-3 font-black text-sm"
             >
               <CalendarIcon className="w-5 h-5 text-indigo-500" />
-              開啟日曆
+              <span>開啟日曆</span>
             </button>
             <div className="hidden md:flex glass rounded-2xl p-1 shadow-indigo-500/5">
               <button onClick={handlePrevMonth} className="p-2.5 hover:bg-white rounded-xl transition-all text-slate-400">
@@ -149,19 +185,22 @@ export const MainPage: React.FC = () => {
         </div>
 
         {eventsError && (
-          <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl text-rose-600 text-xs font-bold flex items-center gap-3">
-            <AlertCircle className="w-4 h-4" />
+          <div className="mb-8 p-5 bg-rose-50 border border-rose-100 rounded-[2rem] text-rose-600 text-sm font-bold flex items-center gap-4">
+            <AlertCircle className="w-5 h-5 shrink-0" />
             <span>連線錯誤: {eventsError}。請檢查網路或 Firebase 權限。</span>
           </div>
         )}
 
         {eventsLoading ? (
-          <div className="flex flex-col items-center justify-center py-32 gap-4">
-            <Loader2 className="w-10 h-10 animate-spin text-indigo-500" />
-            <p className="font-black tracking-[0.3em] text-slate-300 text-[10px] uppercase">正在同步雲端資料</p>
+          <div className="flex flex-col items-center justify-center py-32 gap-6">
+            <div className="relative">
+              <Loader2 className="w-12 h-12 animate-spin text-indigo-500" />
+              <div className="absolute inset-0 bg-indigo-500/10 blur-xl rounded-full"></div>
+            </div>
+            <p className="font-black tracking-[0.4em] text-slate-300 text-xs uppercase">正在同步雲端資料</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 md:gap-10 items-start">
             {/* Calendar Column - Desktop Only */}
             <div className="hidden xl:block xl:col-span-7 2xl:col-span-8">
               <MonthView
@@ -173,21 +212,23 @@ export const MainPage: React.FC = () => {
             </div>
 
             {/* List Column */}
-            <div className="xl:col-span-5 2xl:col-span-4 space-y-6">
+            <div className="xl:col-span-5 2xl:col-span-4 space-y-8">
               <div className="flex items-center justify-between px-2">
                 <h3 className="text-2xl font-black text-slate-800 tracking-tight">
                   進行中的計畫
                 </h3>
-                <span className="bg-white px-2.5 py-1.5 rounded-lg text-slate-500 text-xs font-black uppercase tracking-widest border border-slate-100 shadow-sm">
+                <span className="bg-white px-3 py-2 rounded-xl text-slate-500 text-xs font-black uppercase tracking-widest border border-slate-100 shadow-sm">
                   {events.length} 個項目
                 </span>
               </div>
-              <AgendaView
-                events={events}
-                onEventClick={handleEditEvent}
-                onToggleComplete={toggleComplete}
-                onDeleteEvent={handleConfirmDelete}
-              />
+              <div className="px-1 md:px-0">
+                <AgendaView
+                  events={events}
+                  onEventClick={handleEditEvent}
+                  onToggleComplete={toggleComplete}
+                  onDeleteEvent={handleConfirmDelete}
+                />
+              </div>
             </div>
           </div>
         )}
@@ -221,7 +262,7 @@ export const MainPage: React.FC = () => {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="p-4 overflow-y-auto">
+            <div className="p-6 overflow-y-auto">
               <MonthView
                 currentDate={currentDate}
                 events={events}
@@ -240,7 +281,7 @@ export const MainPage: React.FC = () => {
           className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300"
         >
           <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg animate-in zoom-in-95 duration-500 overflow-hidden flex flex-col max-h-[85vh]">
-            <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-indigo-50/30">
+            <div className="px-8 py-7 border-b border-slate-50 flex items-center justify-between bg-indigo-50/30">
               <div>
                 <h3 className="text-2xl font-black text-slate-900 tracking-tight">{format(currentDate, 'MM/dd')} 計畫清單</h3>
                 <p className="text-xs font-bold text-indigo-500 uppercase tracking-widest mt-1">{format(currentDate, 'yyyy')} WORKSPACE</p>
@@ -249,7 +290,7 @@ export const MainPage: React.FC = () => {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="p-6 overflow-y-auto">
+            <div className="p-6 md:p-8 overflow-y-auto">
               {selectedDateEvents.length > 0 ? (
                 <AgendaView
                   events={selectedDateEvents}
@@ -258,19 +299,22 @@ export const MainPage: React.FC = () => {
                   onDeleteEvent={handleConfirmDelete}
                 />
               ) : (
-                <div className="py-12 text-center space-y-4">
-                  <div className="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto">
-                    <CalendarIcon className="w-10 h-10 text-slate-200" />
+                <div className="py-16 text-center space-y-6">
+                  <div className="bg-slate-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                    <CalendarIcon className="w-12 h-12 text-slate-200" />
                   </div>
-                  <p className="text-slate-400 font-bold">這一天目前沒有任何計畫</p>
+                  <div className="space-y-2">
+                    <p className="text-slate-500 font-black text-lg">這一天目前沒有計畫</p>
+                    <p className="text-slate-400 text-sm font-bold">開始規劃您的精彩一天吧！</p>
+                  </div>
                   <button
                     onClick={() => {
                       setShowDayEvents(false);
                       handleAddEvent();
                     }}
-                    className="bg-indigo-600 text-white px-6 py-2 rounded-xl font-black text-sm shadow-lg shadow-indigo-100"
+                    className="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black text-sm shadow-xl shadow-indigo-100 active:scale-95 transition-all"
                   >
-                    立即新增
+                    立即新增計畫
                   </button>
                 </div>
               )}
