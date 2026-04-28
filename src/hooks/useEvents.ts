@@ -90,8 +90,12 @@ export const useEvents = () => {
 
   const toggleComplete = async (id: string, currentStatus: boolean) => {
     const eventRef = doc(db, 'events', id);
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    
     await updateDoc(eventRef, {
       isCompleted: !currentStatus,
+      completedAt: !currentStatus ? todayStr : null,
       updatedAt: serverTimestamp()
     });
   };

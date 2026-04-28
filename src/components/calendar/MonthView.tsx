@@ -19,7 +19,12 @@ export const MonthView: React.FC<MonthViewProps> = ({
   const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
 
   const getEventsForDay = (day: Date) => {
-    return events.filter(event => event.targetDate === format(day, 'yyyy-MM-dd'));
+    const current = startOfDay(day);
+    return events.filter(event => {
+      const start = startOfDay(parseISO(event.startDate));
+      const end = startOfDay(parseISO(event.targetDate));
+      return current >= start && current <= end;
+    });
   };
 
   const today = startOfDay(new Date());
@@ -39,17 +44,18 @@ export const MonthView: React.FC<MonthViewProps> = ({
           const dayEvents = getEventsForDay(day);
           const isTodayDate = isSameDay(day, new Date());
           const isCurrentMonth = isSameMonth(day, currentDate);
+          const dayStr = format(day, 'yyyy-MM-dd');
 
           return (
             <div
               key={idx}
               onClick={() => onDateClick(day)}
-              className={`min-h-[80px] rounded-2xl p-1.5 transition-all duration-300 cursor-pointer group ${
+              className={`min-h-[100px] rounded-2xl p-1.5 transition-all duration-300 cursor-pointer group relative ${
                 isCurrentMonth ? 'bg-white/60 hover:bg-white hover:shadow-lg hover:shadow-indigo-500/10' : 'opacity-10'
               }`}
             >
               <div className="flex justify-start mb-1 ml-0.5">
-                <span className={`inline-flex items-center justify-center w-6 h-6 text-[10px] rounded-lg font-black transition-all ${
+                <span className={`inline-flex items-center justify-center w-6 h-6 text-[10px] rounded-lg font-black transition-all z-10 ${
                   isTodayDate 
                     ? 'bg-indigo-600 text-white shadow-lg' 
                     : isCurrentMonth ? 'text-slate-800' : 'text-slate-400'
@@ -58,12 +64,23 @@ export const MonthView: React.FC<MonthViewProps> = ({
                 </span>
               </div>
               
-              <div className="space-y-0.5 overflow-hidden px-0.5">
-                {dayEvents.slice(0, 3).map(event => {
+              <div className="space-y-1 overflow-hidden px-0.5 relative z-10">
+                {dayEvents.slice(0, 4).map(event => {
+                  const isStart = event.startDate === dayStr;
+                  const isEnd = event.targetDate === dayStr;
+                  const isCompletedOnThisDay = event.isCompleted && event.completedAt === dayStr;
                   const isDelayed = !event.isCompleted && isBefore(parseISO(event.targetDate), today);
-                  const colorClass = event.isCompleted 
-                    ? 'bg-slate-100 text-slate-400' 
-                    : isDelayed ? 'bg-rose-50 text-rose-600' : 'bg-indigo-50 text-indigo-600';
+                  
+                  let colorClass = 'bg-indigo-500/10 text-indigo-700';
+                  let barClass = 'bg-indigo-500/10';
+                  
+                  if (event.isCompleted) {
+                    colorClass = isCompletedOnThisDay ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-50 text-slate-300';
+                    barClass = 'bg-slate-100/50';
+                  } else if (isDelayed) {
+                    colorClass = 'bg-rose-50 text-rose-600';
+                    barClass = 'bg-rose-100/30';
+                  }
 
                   return (
                     <div
@@ -72,9 +89,18 @@ export const MonthView: React.FC<MonthViewProps> = ({
                         e.stopPropagation();
                         onEventClick(event);
                       }}
-                      className={`px-1.5 py-0.5 text-[8px] font-black rounded-md truncate transition-all ${colorClass}`}
+                      className={`relative px-1.5 py-0.5 text-[8px] font-black rounded-md truncate transition-all ${colorClass} ${
+                        !isStart && !isEnd ? 'rounded-none' : ''
+                      } ${isStart ? 'rounded-r-none' : ''} ${isEnd ? 'rounded-l-none' : ''}`}
                     >
-                      {event.title}
+                      {(isStart || (idx % 7 === 0)) && (
+                        <span className="flex items-center gap-1">
+                          {isCompletedOnThisDay && <span className="w-1 h-1 bg-emerald-500 rounded-full" />}
+                          {event.title}
+                        </span>
+                      )}
+                      {/* 背景區間線條 */}
+                      <div className={`absolute inset-y-0 -left-2 -right-2 ${barClass} -z-10`} />
                     </div>
                   );
                 })}
