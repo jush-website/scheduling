@@ -97,6 +97,7 @@ export const MainPage: React.FC = () => {
     setShowSettings(false);
     setShowCompletedModal(false);
     setEditingEvent(null);
+    setCurrentDate(new Date());
   };
 
   const backdropClick = (e: React.MouseEvent) => {
@@ -186,7 +187,7 @@ export const MainPage: React.FC = () => {
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setShowMobileCalendar(true)}
-              className="flex-1 md:flex-none p-4 bg-white border border-slate-100 rounded-2xl text-slate-700 shadow-sm transition-all active:scale-95 flex items-center justify-center gap-3 font-black text-sm"
+              className="flex-1 md:flex-none p-4 bg-white border border-slate-100 rounded-2xl text-slate-700 shadow-sm transition-all active:scale-95 flex items-center justify-center gap-3 font-black text-sm xl:hidden"
             >
               <CalendarIcon className="w-5 h-5 text-indigo-500" />
               <span>開啟日曆</span>
