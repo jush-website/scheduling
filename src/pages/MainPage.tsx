@@ -8,7 +8,7 @@ import { EventForm } from '../components/form/EventForm';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import type { CalendarEvent } from '../types';
 import { format, addMonths, subMonths } from '../utils/date';
-import { ChevronLeft, ChevronRight, X, Plus, Calendar as CalendarIcon, Loader2, AlertCircle, Settings, LogOut, ChevronDown, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Plus, Calendar as CalendarIcon, Loader2, AlertCircle, Settings, LogOut, CheckCircle2 } from 'lucide-react';
 import { useEvents } from '../hooks/useEvents';
 import { useAuth } from '../context/AuthContext';
 
@@ -25,7 +25,7 @@ export const MainPage: React.FC = () => {
   const [showMobileCalendar, setShowMobileCalendar] = useState(false);
   const [showDayEvents, setShowDayEvents] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [showCompleted, setShowCompleted] = useState(false);
+  const [showCompletedModal, setShowCompletedModal] = useState(false);
 
   const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
   const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
@@ -48,12 +48,14 @@ export const MainPage: React.FC = () => {
     setEditingEvent(event);
     setIsFormOpen(true);
     setShowDayEvents(false);
+    setShowCompletedModal(false);
   };
 
   const handleConfirmDelete = (event: CalendarEvent) => {
     setEventToDelete(event);
     setIsDeleteModalOpen(true);
     setShowDayEvents(false);
+    setShowCompletedModal(false);
   };
 
   const handleSubmit = async (formData: any) => {
@@ -93,6 +95,7 @@ export const MainPage: React.FC = () => {
     setShowMobileCalendar(false);
     setShowDayEvents(false);
     setShowSettings(false);
+    setShowCompletedModal(false);
     setEditingEvent(null);
   };
 
@@ -103,11 +106,11 @@ export const MainPage: React.FC = () => {
   // 分類計畫
   const ongoingEvents = events
     .filter(e => !e.isCompleted)
-    .sort((a, b) => a.targetDate.localeCompare(b.targetDate)); // 緊急度排序：日期越早越前面
+    .sort((a, b) => a.targetDate.localeCompare(b.targetDate));
 
   const completedEvents = events
     .filter(e => e.isCompleted)
-    .sort((a, b) => (b.completedAt || '').localeCompare(a.completedAt || '')); // 按完成日期排序
+    .sort((a, b) => (b.completedAt || '').localeCompare(a.completedAt || ''));
 
   const selectedDateEvents = events.filter(e => e.targetDate === format(currentDate, 'yyyy-MM-dd'));
 
@@ -135,30 +138,47 @@ export const MainPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Mobile Settings Gear */}
-              <div className="md:hidden relative">
+              {/* Header Actions (Completed & Settings) */}
+              <div className="flex items-center gap-2">
+                {/* Completed Button */}
                 <button 
-                  onClick={() => setShowSettings(!showSettings)}
-                  className="p-3 bg-white border border-slate-100 rounded-2xl text-slate-400 shadow-sm active:scale-95 transition-all"
+                  onClick={() => setShowCompletedModal(true)}
+                  className="p-3 bg-white border border-slate-100 rounded-2xl text-emerald-500 shadow-sm active:scale-95 transition-all relative"
+                  title="已完成的計畫"
                 >
-                  <Settings className="w-6 h-6" />
+                  <CheckCircle2 className="w-6 h-6" />
+                  {completedEvents.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-emerald-500 text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">
+                      {completedEvents.length}
+                    </span>
+                  )}
                 </button>
-                
-                {showSettings && (
-                  <div className="absolute right-0 mt-3 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 z-[70] animate-in zoom-in-95 duration-200">
-                    <div className="px-4 py-3 border-b border-slate-50 mb-1">
-                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest">目前使用者</p>
-                      <p className="text-sm font-bold text-slate-700 truncate">{user?.displayName}</p>
+
+                {/* Settings Button */}
+                <div className="md:hidden relative">
+                  <button 
+                    onClick={() => setShowSettings(!showSettings)}
+                    className="p-3 bg-white border border-slate-100 rounded-2xl text-slate-400 shadow-sm active:scale-95 transition-all"
+                  >
+                    <Settings className="w-6 h-6" />
+                  </button>
+                  
+                  {showSettings && (
+                    <div className="absolute right-0 mt-3 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 z-[70] animate-in zoom-in-95 duration-200">
+                      <div className="px-4 py-3 border-b border-slate-50 mb-1">
+                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest">目前使用者</p>
+                        <p className="text-sm font-bold text-slate-700 truncate">{user?.displayName}</p>
+                      </div>
+                      <button 
+                        onClick={logout}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors font-bold text-sm"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        登出系統
+                      </button>
                     </div>
-                    <button 
-                      onClick={logout}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors font-bold text-sm"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      登出系統
-                    </button>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -241,36 +261,6 @@ export const MainPage: React.FC = () => {
                   />
                 </div>
               </div>
-
-              {/* Completed Section */}
-              {completedEvents.length > 0 && (
-                <div className="pt-4">
-                  <button 
-                    onClick={() => setShowCompleted(!showCompleted)}
-                    className="flex items-center justify-between w-full px-4 py-3 bg-slate-100/50 hover:bg-slate-100 rounded-2xl transition-all group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <CheckCircle2 className={`w-5 h-5 ${showCompleted ? 'text-emerald-500' : 'text-slate-400'}`} />
-                      <span className="text-sm font-black text-slate-600">已完成的計畫</span>
-                      <span className="text-[10px] font-black text-slate-400 bg-white px-2 py-0.5 rounded-full border border-slate-200">
-                        {completedEvents.length}
-                      </span>
-                    </div>
-                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${showCompleted ? 'rotate-180' : ''}`} />
-                  </button>
-
-                  {showCompleted && (
-                    <div className="mt-4 space-y-4 animate-in slide-in-from-top-2 duration-300">
-                      <AgendaView
-                        events={completedEvents}
-                        onEventClick={handleEditEvent}
-                        onToggleComplete={toggleComplete}
-                        onDeleteEvent={handleConfirmDelete}
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -293,7 +283,7 @@ export const MainPage: React.FC = () => {
                     <ChevronLeft className="w-4 h-4" />
                   </button>
                   <button onClick={handleToday} className="px-3 py-1 text-[10px] font-black text-slate-700 hover:text-indigo-600 transition-all uppercase">
-                    今
+                    {format(currentDate, 'M月')}
                   </button>
                   <button onClick={handleNextMonth} className="p-2 hover:bg-white rounded-lg transition-all text-slate-400">
                     <ChevronRight className="w-4 h-4" />
@@ -311,6 +301,41 @@ export const MainPage: React.FC = () => {
                 onDateClick={handleDateClick}
                 onEventClick={handleEditEvent}
               />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Completed Events Modal */}
+      {showCompletedModal && (
+        <div 
+          onClick={backdropClick}
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300"
+        >
+          <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg animate-in zoom-in-95 duration-500 overflow-hidden flex flex-col max-h-[85vh]">
+            <div className="px-8 py-7 border-b border-slate-50 flex items-center justify-between bg-emerald-50/30">
+              <div>
+                <h3 className="text-2xl font-black text-slate-900 tracking-tight">已完成的計畫</h3>
+                <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest mt-1">TOTAL {completedEvents.length} ITEMS</p>
+              </div>
+              <button onClick={() => setShowCompletedModal(false)} className="p-2 rounded-full hover:bg-slate-100 text-slate-400">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 md:p-8 overflow-y-auto">
+              {completedEvents.length > 0 ? (
+                <AgendaView
+                  events={completedEvents}
+                  onEventClick={handleEditEvent}
+                  onToggleComplete={toggleComplete}
+                  onDeleteEvent={handleConfirmDelete}
+                />
+              ) : (
+                <div className="py-16 text-center space-y-4">
+                  <CheckCircle2 className="w-16 h-16 text-slate-100 mx-auto" />
+                  <p className="text-slate-400 font-bold">目前沒有已完成的計畫</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

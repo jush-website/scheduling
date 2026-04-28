@@ -98,11 +98,11 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
             </div>
 
             <div className="absolute top-4 right-4 flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all">
-              <button onClick={() => onEventClick(event)} className="p-2.5 bg-white/80 md:bg-transparent shadow-sm md:shadow-none border border-slate-100 md:border-none rounded-xl text-slate-400 hover:text-indigo-600 transition-colors">
-                <Edit3 className="w-5 h-5 md:w-4 md:h-4" />
+              <button onClick={() => onEventClick(event)} className="p-2 bg-white/80 md:bg-transparent shadow-sm md:shadow-none border border-slate-100 md:border-none rounded-lg text-slate-400 hover:text-indigo-600 transition-colors">
+                <Edit3 className="w-4 h-4" />
               </button>
-              <button onClick={() => onDeleteEvent(event)} className="p-2.5 bg-white/80 md:bg-transparent shadow-sm md:shadow-none border border-slate-100 md:border-none rounded-xl text-slate-400 hover:text-rose-500 transition-colors">
-                <Trash2 className="w-5 h-5 md:w-4 md:h-4" />
+              <button onClick={() => onDeleteEvent(event)} className="p-2 bg-white/80 md:bg-transparent shadow-sm md:shadow-none border border-slate-100 md:border-none rounded-lg text-slate-400 hover:text-rose-500 transition-colors">
+                <Trash2 className="w-4 h-4" />
               </button>
             </div>
           </div>
