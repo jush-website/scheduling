@@ -112,7 +112,7 @@ export const MainPage: React.FC = () => {
               <button onClick={handlePrevMonth} className="p-2.5 hover:bg-white rounded-xl transition-all text-slate-400">
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <button onClick={handleToday} className="px-4 py-2 text-[10px] font-black text-slate-700 hover:text-indigo-600 transition-all uppercase tracking-widest">
+              <button onClick={handleToday} className="px-6 py-2 text-sm font-black text-slate-700 hover:text-indigo-600 transition-all uppercase tracking-widest">
                 今天
               </button>
               <button onClick={handleNextMonth} className="p-2.5 hover:bg-white rounded-xl transition-all text-slate-400">
@@ -121,9 +121,9 @@ export const MainPage: React.FC = () => {
             </div>
             <button
               onClick={handleAddEvent}
-              className="hidden md:flex bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-6 py-3 rounded-2xl font-black shadow-lg shadow-indigo-200 hover:scale-105 transition-all items-center gap-2 uppercase tracking-widest text-[10px]"
+              className="hidden md:flex bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-indigo-200 hover:scale-105 transition-all items-center gap-2 uppercase tracking-widest text-sm"
             >
-              <Plus className="w-3 h-3 stroke-[3]" />
+              <Plus className="w-4 h-4 stroke-[3]" />
               新增計畫
             </button>
           </div>
