@@ -8,7 +8,7 @@ import { EventForm } from '../components/form/EventForm';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import type { CalendarEvent } from '../types';
 import { format, addMonths, subMonths } from '../utils/date';
-import { ChevronLeft, ChevronRight, X, Plus, Calendar as CalendarIcon, Loader2, AlertCircle, Settings, LogOut, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Plus, Calendar as CalendarIcon, Loader2, AlertCircle, Settings, LogOut, CheckCircle2, Search, ArrowUpDown } from 'lucide-react';
 import { useEvents } from '../hooks/useEvents';
 import { useAuth } from '../context/AuthContext';
 
@@ -26,6 +26,8 @@ export const MainPage: React.FC = () => {
   const [showDayEvents, setShowDayEvents] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showCompletedModal, setShowCompletedModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'date' | 'title'>('date');
 
   const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
   const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
@@ -104,10 +106,19 @@ export const MainPage: React.FC = () => {
     if (e.target === e.currentTarget) closeModals();
   };
 
-  // 分類計畫
+  // 分類計畫與排序過濾
   const ongoingEvents = events
     .filter(e => !e.isCompleted)
-    .sort((a, b) => a.targetDate.localeCompare(b.targetDate));
+    .filter(e => 
+      e.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      (e.description?.toLowerCase().includes(searchQuery.toLowerCase()))
+    )
+    .sort((a, b) => {
+      if (sortBy === 'date') {
+        return a.targetDate.localeCompare(b.targetDate);
+      }
+      return a.title.localeCompare(b.title);
+    });
 
   const completedEvents = events
     .filter(e => e.isCompleted)
@@ -244,15 +255,38 @@ export const MainPage: React.FC = () => {
             <div className="xl:col-span-5 2xl:col-span-4 space-y-8">
               {/* Ongoing Section */}
               <div className="space-y-6">
-                <div className="flex items-center justify-between px-2">
-                  <h3 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-3">
-                    進行中的計畫
-                    <span className="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-tighter">Urgent first</span>
-                  </h3>
-                  <span className="bg-white px-3 py-2 rounded-xl text-slate-500 text-xs font-black uppercase tracking-widest border border-slate-100 shadow-sm">
-                    {ongoingEvents.length}
-                  </span>
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between px-2">
+                    <h3 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-3">
+                      進行中的計畫
+                    </h3>
+                    <span className="bg-white px-3 py-2 rounded-xl text-slate-500 text-xs font-black uppercase tracking-widest border border-slate-100 shadow-sm">
+                      {ongoingEvents.length}
+                    </span>
+                  </div>
+                  
+                  {/* Search and Filter UI */}
+                  <div className="flex flex-col sm:flex-row gap-2 px-1">
+                    <div className="relative flex-1 group">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                      <input 
+                        type="text"
+                        placeholder="搜尋計畫名稱或描述..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-11 pr-4 py-3 bg-white border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-200 transition-all shadow-sm"
+                      />
+                    </div>
+                    <button 
+                      onClick={() => setSortBy(sortBy === 'date' ? 'title' : 'date')}
+                      className="flex items-center justify-center gap-2 px-5 py-3 bg-white border border-slate-100 rounded-2xl text-xs font-black text-slate-600 hover:bg-slate-50 transition-all shadow-sm active:scale-95"
+                    >
+                      <ArrowUpDown className="w-3.5 h-3.5 text-indigo-500" />
+                      {sortBy === 'date' ? '依日期排序' : '依名稱排序'}
+                    </button>
+                  </div>
                 </div>
+
                 <div className="px-1 md:px-0">
                   <AgendaView
                     events={ongoingEvents}
@@ -291,7 +325,7 @@ export const MainPage: React.FC = () => {
                   </button>
                 </div>
               </div>
-              <button onClick={() => setShowMobileCalendar(false)} className="p-2 rounded-full hover:bg-slate-100 text-slate-400">
+              <button onClick={closeModals} className="p-2 rounded-full hover:bg-slate-100 text-slate-400">
                 <X className="w-5 h-5" />
               </button>
             </div>
