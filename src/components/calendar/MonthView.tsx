@@ -1,6 +1,7 @@
 import React from 'react';
 import { getMonthDays, format, isSameMonth, isSameDay, parseISO, isBefore, startOfDay } from '../../utils/date';
 import type { CalendarEvent } from '../../types';
+import { getEventColor } from '../../utils/color';
 
 interface MonthViewProps {
   currentDate: Date;
@@ -33,7 +34,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
     <div className="bg-white/40 backdrop-blur-sm rounded-[2rem] p-3 border border-white/60 overflow-hidden shadow-2xl shadow-indigo-500/5">
       <div className="grid grid-cols-7 mb-2">
         {weekDays.map(day => (
-          <div key={day} className="py-2 text-center text-[9px] font-black text-slate-400 uppercase tracking-widest">
+          <div key={day} className="py-2 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">
             {day}
           </div>
         ))}
@@ -50,7 +51,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
             <div
               key={idx}
               onClick={() => onDateClick(day)}
-              className={`min-h-[100px] rounded-2xl p-1.5 transition-all duration-300 cursor-pointer group relative ${
+              className={`min-h-[110px] rounded-2xl p-1 transition-all duration-300 cursor-pointer group relative ${
                 isCurrentMonth ? 'bg-white/60 hover:bg-white hover:shadow-lg hover:shadow-indigo-500/10' : 'opacity-10'
               }`}
             >
@@ -64,22 +65,24 @@ export const MonthView: React.FC<MonthViewProps> = ({
                 </span>
               </div>
               
-              <div className="space-y-1 overflow-hidden px-0.5 relative z-10">
+              <div className="space-y-1 overflow-visible px-0 relative z-10">
                 {dayEvents.slice(0, 4).map(event => {
                   const isStart = event.startDate === dayStr;
                   const isEnd = event.targetDate === dayStr;
                   const isCompletedOnThisDay = event.isCompleted && event.completedAt === dayStr;
                   const isDelayed = !event.isCompleted && isBefore(parseISO(event.targetDate), today);
                   
-                  let colorClass = 'bg-indigo-500/10 text-indigo-700';
-                  let barClass = 'bg-indigo-500/10';
+                  const eventColor = getEventColor(event.id);
+                  
+                  let colorClass = `${eventColor.light} ${eventColor.text}`;
+                  let barClass = eventColor.bar;
                   
                   if (event.isCompleted) {
-                    colorClass = isCompletedOnThisDay ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-50 text-slate-300';
-                    barClass = 'bg-slate-100/50';
+                    colorClass = isCompletedOnThisDay ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-50 text-slate-200';
+                    barClass = 'bg-slate-100/30';
                   } else if (isDelayed) {
-                    colorClass = 'bg-rose-50 text-rose-600';
-                    barClass = 'bg-rose-100/30';
+                    colorClass = 'bg-rose-100 text-rose-700';
+                    barClass = 'bg-rose-200/40';
                   }
 
                   return (
@@ -89,17 +92,17 @@ export const MonthView: React.FC<MonthViewProps> = ({
                         e.stopPropagation();
                         onEventClick(event);
                       }}
-                      className={`relative px-1.5 h-4 flex items-center text-[8px] font-black truncate transition-all ${colorClass} ${
-                        !isStart && !isEnd ? 'rounded-none' : 'rounded-md'
+                      className={`relative px-1 h-4 flex items-center text-[7px] md:text-[8px] font-black truncate transition-all ${colorClass} ${
+                        !isStart && !isEnd ? 'rounded-none' : 'rounded-sm'
                       } ${isStart ? 'rounded-r-none' : ''} ${isEnd ? 'rounded-l-none' : ''}`}
                     >
                       {(isStart || (idx % 7 === 0)) && (
-                        <span className="flex items-center gap-1 z-20">
-                          {isCompletedOnThisDay && <span className="w-1 h-1 bg-emerald-500 rounded-full" />}
+                        <span className="flex items-center gap-0.5 z-20 whitespace-nowrap overflow-hidden">
+                          {isCompletedOnThisDay && <span className="w-1 h-1 bg-emerald-500 rounded-full shrink-0" />}
                           {event.title}
                         </span>
                       )}
-                      {/* 背景區間線條 - 統一高度與對齊 */}
+                      {/* 背景區間線條 */}
                       <div className={`absolute inset-y-0 -left-1 -right-1 ${barClass} -z-10`} />
                     </div>
                   );

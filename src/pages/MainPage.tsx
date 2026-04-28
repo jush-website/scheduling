@@ -8,7 +8,7 @@ import { EventForm } from '../components/form/EventForm';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import type { CalendarEvent } from '../types';
 import { format, addMonths, subMonths } from '../utils/date';
-import { ChevronLeft, ChevronRight, X, Plus, Calendar as CalendarIcon, Loader2, AlertCircle, Settings, LogOut } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Plus, Calendar as CalendarIcon, Loader2, AlertCircle, Settings, LogOut, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { useEvents } from '../hooks/useEvents';
 import { useAuth } from '../context/AuthContext';
 
@@ -25,6 +25,7 @@ export const MainPage: React.FC = () => {
   const [showMobileCalendar, setShowMobileCalendar] = useState(false);
   const [showDayEvents, setShowDayEvents] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showCompleted, setShowCompleted] = useState(false);
 
   const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
   const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
@@ -46,14 +47,12 @@ export const MainPage: React.FC = () => {
   const handleEditEvent = (event: CalendarEvent) => {
     setEditingEvent(event);
     setIsFormOpen(true);
-    // 編輯時如果當日計畫視窗開著，先關掉
     setShowDayEvents(false);
   };
 
   const handleConfirmDelete = (event: CalendarEvent) => {
     setEventToDelete(event);
     setIsDeleteModalOpen(true);
-    // 刪除時如果當日計畫視窗開著，先關掉
     setShowDayEvents(false);
   };
 
@@ -100,6 +99,15 @@ export const MainPage: React.FC = () => {
   const backdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) closeModals();
   };
+
+  // 分類計畫
+  const ongoingEvents = events
+    .filter(e => !e.isCompleted)
+    .sort((a, b) => a.targetDate.localeCompare(b.targetDate)); // 緊急度排序：日期越早越前面
+
+  const completedEvents = events
+    .filter(e => e.isCompleted)
+    .sort((a, b) => (b.completedAt || '').localeCompare(a.completedAt || '')); // 按完成日期排序
 
   const selectedDateEvents = events.filter(e => e.targetDate === format(currentDate, 'yyyy-MM-dd'));
 
@@ -213,22 +221,56 @@ export const MainPage: React.FC = () => {
 
             {/* List Column */}
             <div className="xl:col-span-5 2xl:col-span-4 space-y-8">
-              <div className="flex items-center justify-between px-2">
-                <h3 className="text-2xl font-black text-slate-800 tracking-tight">
-                  進行中的計畫
-                </h3>
-                <span className="bg-white px-3 py-2 rounded-xl text-slate-500 text-xs font-black uppercase tracking-widest border border-slate-100 shadow-sm">
-                  {events.length} 個項目
-                </span>
+              {/* Ongoing Section */}
+              <div className="space-y-6">
+                <div className="flex items-center justify-between px-2">
+                  <h3 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-3">
+                    進行中的計畫
+                    <span className="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-tighter">Urgent first</span>
+                  </h3>
+                  <span className="bg-white px-3 py-2 rounded-xl text-slate-500 text-xs font-black uppercase tracking-widest border border-slate-100 shadow-sm">
+                    {ongoingEvents.length}
+                  </span>
+                </div>
+                <div className="px-1 md:px-0">
+                  <AgendaView
+                    events={ongoingEvents}
+                    onEventClick={handleEditEvent}
+                    onToggleComplete={toggleComplete}
+                    onDeleteEvent={handleConfirmDelete}
+                  />
+                </div>
               </div>
-              <div className="px-1 md:px-0">
-                <AgendaView
-                  events={events}
-                  onEventClick={handleEditEvent}
-                  onToggleComplete={toggleComplete}
-                  onDeleteEvent={handleConfirmDelete}
-                />
-              </div>
+
+              {/* Completed Section */}
+              {completedEvents.length > 0 && (
+                <div className="pt-4">
+                  <button 
+                    onClick={() => setShowCompleted(!showCompleted)}
+                    className="flex items-center justify-between w-full px-4 py-3 bg-slate-100/50 hover:bg-slate-100 rounded-2xl transition-all group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <CheckCircle2 className={`w-5 h-5 ${showCompleted ? 'text-emerald-500' : 'text-slate-400'}`} />
+                      <span className="text-sm font-black text-slate-600">已完成的計畫</span>
+                      <span className="text-[10px] font-black text-slate-400 bg-white px-2 py-0.5 rounded-full border border-slate-200">
+                        {completedEvents.length}
+                      </span>
+                    </div>
+                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${showCompleted ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {showCompleted && (
+                    <div className="mt-4 space-y-4 animate-in slide-in-from-top-2 duration-300">
+                      <AgendaView
+                        events={completedEvents}
+                        onEventClick={handleEditEvent}
+                        onToggleComplete={toggleComplete}
+                        onDeleteEvent={handleConfirmDelete}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}
