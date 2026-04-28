@@ -27,7 +27,7 @@ export const MainPage: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showCompletedModal, setShowCompletedModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<'date' | 'title'>('date');
+  const [sortBy, setSortBy] = useState<'date' | 'title' | 'duration'>('date');
 
   const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
   const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
@@ -117,7 +117,13 @@ export const MainPage: React.FC = () => {
       if (sortBy === 'date') {
         return a.targetDate.localeCompare(b.targetDate);
       }
-      return a.title.localeCompare(b.title);
+      if (sortBy === 'title') {
+        return a.title.localeCompare(b.title);
+      }
+      // 依時間長短排序 (Duration)
+      const durationA = Math.abs(new Date(a.targetDate).getTime() - new Date(a.startDate).getTime());
+      const durationB = Math.abs(new Date(b.targetDate).getTime() - new Date(b.startDate).getTime());
+      return durationB - durationA; // 長的在前
     });
 
   const completedEvents = events
@@ -125,6 +131,12 @@ export const MainPage: React.FC = () => {
     .sort((a, b) => (b.completedAt || '').localeCompare(a.completedAt || ''));
 
   const selectedDateEvents = events.filter(e => e.targetDate === format(currentDate, 'yyyy-MM-dd'));
+
+  const toggleSort = () => {
+    if (sortBy === 'date') setSortBy('title');
+    else if (sortBy === 'title') setSortBy('duration');
+    else setSortBy('date');
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50/50">
@@ -278,11 +290,13 @@ export const MainPage: React.FC = () => {
                       />
                     </div>
                     <button 
-                      onClick={() => setSortBy(sortBy === 'date' ? 'title' : 'date')}
+                      onClick={toggleSort}
                       className="flex items-center justify-center gap-2 px-5 py-3 bg-white border border-slate-100 rounded-2xl text-xs font-black text-slate-600 hover:bg-slate-50 transition-all shadow-sm active:scale-95"
                     >
                       <ArrowUpDown className="w-3.5 h-3.5 text-indigo-500" />
-                      {sortBy === 'date' ? '依日期排序' : '依名稱排序'}
+                      {sortBy === 'date' && '依日期排序'}
+                      {sortBy === 'title' && '依名稱排序'}
+                      {sortBy === 'duration' && '依長短排序'}
                     </button>
                   </div>
                 </div>
