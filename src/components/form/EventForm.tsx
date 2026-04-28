@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import type { SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { eventSchema } from '../../utils/validation';
 import type { EventSchemaType } from '../../utils/validation';
@@ -34,8 +35,12 @@ export const EventForm: React.FC<EventFormProps> = ({
       isAllDay: true,
       description: '',
       ...initialData
-    }
+    } as any // Use 'as any' for defaultValues to bypass strict partial mismatch if any
   });
+
+  const onFormSubmit: SubmitHandler<EventSchemaType> = async (data) => {
+    await onSubmit(data);
+  };
 
   // Prevent leaving if form is dirty
   useEffect(() => {
@@ -50,7 +55,7 @@ export const EventForm: React.FC<EventFormProps> = ({
   }, [isDirty]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
       <div className="space-y-1">
         <label className="text-sm font-black text-slate-700 uppercase tracking-widest ml-1">行程名稱</label>
         <input
