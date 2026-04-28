@@ -16,7 +16,7 @@ export const Header: React.FC = () => {
             <h1 className="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600 tracking-tight">
               SmartSched
             </h1>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 opacity-80">Workspace</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 opacity-80">工作空間</span>
           </div>
         </div>
         
@@ -27,7 +27,7 @@ export const Header: React.FC = () => {
                 {user.displayName}
               </span>
               <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">
-                Pro Account
+                專業帳號
               </span>
             </div>
             <div className="h-10 w-10 rounded-2xl bg-slate-100 flex items-center justify-center border-2 border-white shadow-sm overflow-hidden">

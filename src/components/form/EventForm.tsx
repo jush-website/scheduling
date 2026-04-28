@@ -57,17 +57,17 @@ export const EventForm: React.FC<EventFormProps> = ({
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
       <div className="space-y-1">
-        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Plan Title</label>
+        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">計畫名稱</label>
         <input
           {...register('title')}
-          placeholder="What's the plan?"
+          placeholder="有什麼計畫呢？"
           className={`w-full px-3 py-2.5 bg-slate-50 border rounded-xl focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 outline-none transition-all text-sm ${errors.title ? 'border-rose-500' : 'border-slate-200'}`}
         />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Start Date</label>
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">開始日期</label>
           <input
             type="date"
             {...register('startDate')}
@@ -75,7 +75,7 @@ export const EventForm: React.FC<EventFormProps> = ({
           />
         </div>
         <div className="space-y-1">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Target Date</label>
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">目標日期</label>
           <input
             type="date"
             {...register('targetDate')}
@@ -85,10 +85,10 @@ export const EventForm: React.FC<EventFormProps> = ({
       </div>
 
       <div className="space-y-1">
-        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Description (Optional)</label>
+        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">描述 (選填)</label>
         <textarea
           {...register('description')}
-          placeholder="Add details..."
+          placeholder="加入細節..."
           className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500 outline-none transition-all min-h-[70px] text-sm"
         />
       </div>
@@ -99,14 +99,14 @@ export const EventForm: React.FC<EventFormProps> = ({
           disabled={isSubmitting || !isOnline}
           className="flex-[2] bg-indigo-600 text-white py-3 rounded-xl font-black text-sm shadow-lg shadow-indigo-200 hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
         >
-          {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Plan'}
+          {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : '儲存計畫'}
         </button>
         <button
           type="button"
           onClick={onCancel}
           className="flex-1 bg-slate-100 text-slate-500 py-3 rounded-xl font-black text-sm hover:bg-slate-200 transition-all"
         >
-          Cancel
+          取消
         </button>
       </div>
     </form>

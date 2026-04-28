@@ -16,7 +16,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
   onEventClick
 }) => {
   const days = getMonthDays(currentDate);
-  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
 
   const getEventsForDay = (day: Date) => {
     return events.filter(event => event.targetDate === format(day, 'yyyy-MM-dd'));

@@ -19,22 +19,22 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center border">
-        <div className="bg-primary/10 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-          <Calendar className="w-10 h-10 text-primary" />
+      <div className="max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl p-10 text-center border border-white">
+        <div className="bg-indigo-50 w-24 h-24 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-inner">
+          <Calendar className="w-12 h-12 text-indigo-600" />
         </div>
-        <h1 className="text-3xl font-black tracking-tight mb-2">SmartSched</h1>
-        <p className="text-muted-foreground mb-8 text-lg">
-          直覺、高效、跨裝置的<br />個人與團隊排程專家
+        <h1 className="text-4xl font-black tracking-tight mb-4 text-slate-900">SmartSched</h1>
+        <p className="text-slate-400 font-bold mb-10 text-lg leading-relaxed">
+          簡約、高效、直覺的<br />個人排程管理專家
         </p>
         
         <button
           onClick={handleLogin}
           disabled={isLoggingIn}
-          className="w-full bg-white border-2 border-slate-200 hover:border-primary/50 hover:bg-slate-50 text-slate-700 font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-50"
+          className="w-full bg-white border-2 border-slate-100 hover:border-indigo-500 hover:bg-slate-50 text-slate-700 font-black py-5 px-6 rounded-2xl flex items-center justify-center gap-4 transition-all active:scale-[0.98] shadow-sm disabled:opacity-50"
         >
           {isLoggingIn ? (
-            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+            <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
           ) : (
             <>
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-6 h-6" alt="Google" />
@@ -43,8 +43,8 @@ export const LoginPage: React.FC = () => {
           )}
         </button>
         
-        <p className="mt-8 text-xs text-muted-foreground">
-          登入即表示您同意我們的服務條款與隱私權政策
+        <p className="mt-10 text-[10px] text-slate-300 font-black uppercase tracking-widest">
+          安全雲端工作空間
         </p>
       </div>
     </div>

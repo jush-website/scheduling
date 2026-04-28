@@ -52,7 +52,7 @@ export const MainPage: React.FC = () => {
       setIsFormOpen(false);
       setEditingEvent(null);
     } catch (error) {
-      alert("Save failed. Please check your connection.");
+      alert("儲存失敗，請檢查網路連線。");
     } finally {
       setIsSubmitting(false);
     }
@@ -66,7 +66,7 @@ export const MainPage: React.FC = () => {
       setIsDeleteModalOpen(false);
       setEventToDelete(null);
     } catch (error) {
-      alert("Delete failed.");
+      alert("刪除失敗。");
     } finally {
       setIsSubmitting(false);
     }
@@ -96,7 +96,7 @@ export const MainPage: React.FC = () => {
               </span>
               <div className="flex flex-col border-l-4 border-indigo-500 pl-4 py-1">
                 <span className="text-2xl font-black text-slate-800 leading-none">{format(currentDate, 'yyyy')}</span>
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-500 mt-1">Calendar Plans</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-500 mt-1">月份計畫視圖</span>
               </div>
             </div>
           </div>
@@ -113,7 +113,7 @@ export const MainPage: React.FC = () => {
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button onClick={handleToday} className="px-4 py-2 text-[10px] font-black text-slate-700 hover:text-indigo-600 transition-all uppercase tracking-widest">
-                Today
+                今天
               </button>
               <button onClick={handleNextMonth} className="p-2.5 hover:bg-white rounded-xl transition-all text-slate-400">
                 <ChevronRight className="w-4 h-4" />
@@ -124,7 +124,7 @@ export const MainPage: React.FC = () => {
               className="hidden md:flex bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-6 py-3 rounded-2xl font-black shadow-lg shadow-indigo-200 hover:scale-105 transition-all items-center gap-2 uppercase tracking-widest text-[10px]"
             >
               <Plus className="w-3 h-3 stroke-[3]" />
-              New
+              新增計畫
             </button>
           </div>
         </div>
@@ -132,14 +132,14 @@ export const MainPage: React.FC = () => {
         {eventsError && (
           <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl text-rose-600 text-xs font-bold flex items-center gap-3">
             <AlertCircle className="w-4 h-4" />
-            <span>Connection Error: {eventsError}. Please check your internet or Firebase permissions.</span>
+            <span>連線錯誤: {eventsError}。請檢查網路或 Firebase 權限。</span>
           </div>
         )}
 
         {eventsLoading ? (
           <div className="flex flex-col items-center justify-center py-32 gap-4">
             <Loader2 className="w-10 h-10 animate-spin text-indigo-500" />
-            <p className="font-black tracking-[0.3em] text-slate-300 text-[10px] uppercase">Syncing Data</p>
+            <p className="font-black tracking-[0.3em] text-slate-300 text-[10px] uppercase">正在同步雲端資料</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
@@ -156,9 +156,9 @@ export const MainPage: React.FC = () => {
             {/* List Column */}
             <div className="xl:col-span-5 2xl:col-span-4 space-y-6">
               <div className="flex items-center justify-between px-2">
-                <h3 className="text-lg font-black text-slate-800 tracking-tight">Active Plans</h3>
-                <span className="bg-white px-2 py-1 rounded-lg text-slate-400 text-[9px] font-black uppercase tracking-widest border border-slate-100">
-                  {events.filter(e => e.targetDate.startsWith(format(currentDate, 'yyyy-MM'))).length} Items
+                <h3 className="text-2xl font-black text-slate-800 tracking-tight">進行中的計畫</h3>
+                <span className="bg-white px-2.5 py-1.5 rounded-lg text-slate-500 text-xs font-black uppercase tracking-widest border border-slate-100 shadow-sm">
+                  {events.filter(e => e.targetDate.startsWith(format(currentDate, 'yyyy-MM'))).length} 個項目
                 </span>
               </div>
               <AgendaView
@@ -182,7 +182,7 @@ export const MainPage: React.FC = () => {
         >
           <div className="bg-white rounded-[2rem] shadow-2xl max-w-sm w-full animate-in zoom-in-95 duration-500 overflow-hidden">
             <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
-              <h3 className="text-lg font-black text-slate-900 tracking-tight">{editingEvent ? 'Edit Plan' : 'New Plan'}</h3>
+              <h3 className="text-xl font-black text-slate-900 tracking-tight">{editingEvent ? '編輯計畫' : '建立新計畫'}</h3>
               <button onClick={() => setIsFormOpen(false)} className="p-2 rounded-full hover:bg-slate-100 text-slate-400">
                 <X className="w-5 h-5" />
               </button>
@@ -208,8 +208,10 @@ export const MainPage: React.FC = () => {
           <div className="bg-white rounded-[2rem] shadow-2xl max-w-sm w-full p-8 animate-in zoom-in-95 duration-500">
             <ConfirmModal
               isOpen={true}
-              title="Delete Plan?"
-              message={`Are you sure you want to remove "${eventToDelete?.title}"?`}
+              title="確定要刪除嗎？"
+              message={`您確定要移除「${eventToDelete?.title}」嗎？`}
+              confirmText="確定刪除"
+              cancelText="取消"
               onConfirm={handleDelete}
               onCancel={() => setIsDeleteModalOpen(false)}
               isLoading={isSubmitting}
