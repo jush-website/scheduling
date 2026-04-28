@@ -12,7 +12,7 @@ import {
   orderBy
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { CalendarEvent, EventFormData } from '../types';
+import type { CalendarEvent, EventFormData } from '../types';
 import { useAuth } from '../context/AuthContext';
 
 export const useEvents = () => {

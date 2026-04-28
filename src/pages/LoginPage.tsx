@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Calendar, LogIn, Loader2 } from 'lucide-react';
+import { Calendar, Loader2 } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const { loginWithGoogle } = useAuth();

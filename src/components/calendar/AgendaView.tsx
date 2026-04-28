@@ -1,8 +1,8 @@
 import React from 'react';
 import { format, isToday, parseISO } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
-import { CalendarEvent } from '../../types';
-import { Clock, MapPin } from 'lucide-react';
+import type { CalendarEvent } from '../../types';
+import { Clock } from 'lucide-react';
 
 interface AgendaViewProps {
   events: CalendarEvent[];

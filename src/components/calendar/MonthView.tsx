@@ -1,6 +1,6 @@
 import React from 'react';
 import { getMonthDays, format, isSameMonth, isSameDay } from '../../utils/date';
-import { CalendarEvent } from '../../types';
+import type { CalendarEvent } from '../../types';
 
 interface MonthViewProps {
   currentDate: Date;

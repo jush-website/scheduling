@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { eventSchema, EventSchemaType } from '../../utils/validation';
+import { eventSchema } from '../../utils/validation';
+import type { EventSchemaType } from '../../utils/validation';
 import { addHours, format, parse } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 import { useNetworkStatus } from '../../hooks/useNetworkStatus';

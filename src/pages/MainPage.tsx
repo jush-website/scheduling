@@ -6,7 +6,7 @@ import { AgendaView } from '../components/calendar/AgendaView';
 import { FAB } from '../components/layout/FAB';
 import { EventForm } from '../components/form/EventForm';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
-import { CalendarEvent } from '../types';
+import type { CalendarEvent } from '../types';
 import { format, addMonths, subMonths } from '../utils/date';
 import { ChevronLeft, ChevronRight, X, Loader2 } from 'lucide-react';
 import { useEvents } from '../hooks/useEvents';
