@@ -16,25 +16,25 @@ export const MonthView: React.FC<MonthViewProps> = ({
   onEventClick
 }) => {
   const days = getMonthDays(currentDate);
-  const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const getEventsForDay = (day: Date) => {
     return events.filter(event => event.date === format(day, 'yyyy-MM-dd'));
   };
 
   return (
-    <div className="bg-white border rounded-xl overflow-hidden shadow-sm">
+    <div className="bg-white/40 backdrop-blur-sm rounded-[2.5rem] p-4 border border-white/60 overflow-hidden shadow-2xl shadow-indigo-500/5">
       {/* Weekdays Header */}
-      <div className="grid grid-cols-7 border-b bg-muted/30">
+      <div className="grid grid-cols-7 mb-4">
         {weekDays.map(day => (
-          <div key={day} className="py-2 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <div key={day} className="py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
             {day}
           </div>
         ))}
       </div>
 
       {/* Calendar Grid */}
-      <div className="grid grid-cols-7">
+      <div className="grid grid-cols-7 gap-2">
         {days.map((day, idx) => {
           const dayEvents = getEventsForDay(day);
           const isToday = isSameDay(day, new Date());
@@ -44,32 +44,42 @@ export const MonthView: React.FC<MonthViewProps> = ({
             <div
               key={idx}
               onClick={() => onDateClick(day)}
-              className={`min-h-[120px] border-b border-r p-1 transition-colors cursor-pointer hover:bg-muted/20 ${
-                !isCurrentMonth ? 'bg-muted/10' : ''
-              } ${idx % 7 === 6 ? 'border-r-0' : ''}`}
+              className={`min-h-[110px] rounded-3xl p-2 transition-all duration-300 cursor-pointer group ${
+                isCurrentMonth ? 'bg-white/60 hover:bg-white hover:shadow-xl hover:shadow-indigo-500/10' : 'opacity-20'
+              }`}
             >
-              <div className="flex justify-between items-start mb-1">
-                <span className={`inline-flex items-center justify-center w-7 h-7 text-sm rounded-full font-medium ${
-                  isToday ? 'bg-primary text-primary-foreground' : isCurrentMonth ? 'text-foreground' : 'text-muted-foreground'
+              <div className="flex justify-start mb-2 ml-1">
+                <span className={`inline-flex items-center justify-center w-8 h-8 text-sm rounded-xl font-black transition-all ${
+                  isToday 
+                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 scale-110' 
+                    : isCurrentMonth ? 'text-slate-800' : 'text-slate-400'
                 }`}>
                   {format(day, 'd')}
                 </span>
               </div>
               
-              <div className="space-y-1">
-                {dayEvents.map(event => (
+              <div className="space-y-1 overflow-hidden px-1">
+                {dayEvents.slice(0, 3).map(event => (
                   <div
                     key={event.id}
                     onClick={(e) => {
                       e.stopPropagation();
                       onEventClick(event);
                     }}
-                    className="px-2 py-1 text-xs font-medium rounded bg-primary/10 text-primary border border-primary/20 truncate hover:bg-primary/20 transition-colors"
+                    className={`px-2 py-1.5 text-[10px] font-bold rounded-lg truncate transition-all ${
+                      event.isCompleted 
+                        ? 'bg-slate-100 text-slate-400 line-through' 
+                        : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'
+                    }`}
                   >
-                    {!event.isAllDay && <span className="mr-1 font-bold">{event.startTime}</span>}
                     {event.title}
                   </div>
                 ))}
+                {dayEvents.length > 3 && (
+                  <div className="text-[9px] font-black text-slate-300 text-center uppercase tracking-tighter">
+                    + {dayEvents.length - 3} more
+                  </div>
+                )}
               </div>
             </div>
           );

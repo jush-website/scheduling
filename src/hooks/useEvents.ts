@@ -8,8 +8,7 @@ import {
   updateDoc, 
   deleteDoc, 
   doc, 
-  serverTimestamp,
-  orderBy
+  serverTimestamp
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import type { CalendarEvent, EventFormData } from '../types';
@@ -28,11 +27,10 @@ export const useEvents = () => {
     }
 
     setLoading(true);
-    // 注意：如果 Firestore 提示需要建立索引，請點擊 console 中的連結
+    // 移除 orderBy 以避免索引未建立導致的資料消失，改在本地端排序
     const q = query(
       collection(db, 'events'),
-      where('userId', '==', user.uid),
-      orderBy('date', 'asc')
+      where('userId', '==', user.uid)
     );
 
     const unsubscribe = onSnapshot(q, 
@@ -41,12 +39,16 @@ export const useEvents = () => {
         snapshot.forEach((doc) => {
           eventList.push({ id: doc.id, ...doc.data() } as CalendarEvent);
         });
-        setEvents(eventList);
+        
+        // 本地排序：日期由舊到新
+        const sortedList = eventList.sort((a, b) => a.date.localeCompare(b.date));
+        
+        setEvents(sortedList);
         setLoading(false);
       },
       (error) => {
-        console.error("Firestore subscription error:", error);
-        setLoading(false); // 報錯時也要停止 loading
+        console.error("Firestore error:", error);
+        setLoading(false);
       }
     );
 
@@ -57,7 +59,8 @@ export const useEvents = () => {
     if (!user) return;
     await addDoc(collection(db, 'events'), {
       ...eventData,
-      isCompleted: false, // 預設未完成
+      isAllDay: true, // 強制全天
+      isCompleted: false,
       userId: user.uid,
       createdAt: serverTimestamp()
     });

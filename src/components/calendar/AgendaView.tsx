@@ -2,7 +2,7 @@ import React from 'react';
 import { format, isToday, parseISO } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
 import type { CalendarEvent } from '../../types';
-import { Clock, CheckCircle2, Circle, Edit2, Trash2 } from 'lucide-react';
+import { CheckCircle2, Circle, Edit3, Trash2, CalendarDays } from 'lucide-react';
 
 interface AgendaViewProps {
   events: CalendarEvent[];
@@ -27,90 +27,96 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
 
   if (sortedDates.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground bg-white border rounded-2xl border-dashed">
-        <p className="text-lg font-medium">今天沒有安排行程</p>
-        <p className="text-sm">點擊右下角按鈕新增一個吧！</p>
+      <div className="flex flex-col items-center justify-center py-24 text-slate-400 bg-white/40 backdrop-blur-sm border-2 border-dashed border-slate-200 rounded-[2rem] animate-in fade-in zoom-in duration-500">
+        <div className="bg-slate-100 p-6 rounded-full mb-4">
+          <CalendarDays className="w-10 h-10 opacity-20" />
+        </div>
+        <p className="text-lg font-black tracking-tight text-slate-500">尚無計畫安排</p>
+        <p className="text-sm font-medium opacity-60">點擊右下角按鈕開啟新的一天</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 pb-20">
+    <div className="space-y-10 pb-20">
       {sortedDates.map(dateStr => {
         const date = parseISO(dateStr);
         const dayEvents = groupedEvents[dateStr];
 
         return (
-          <div key={dateStr} className="space-y-4">
-            <div className="flex items-center gap-3 px-2">
-              <span className={`text-xl font-black ${isToday(date) ? 'text-primary' : 'text-slate-800'}`}>
-                {format(date, 'MM/dd (E)', { locale: zhTW })}
-              </span>
-              {isToday(date) && (
-                <span className="bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider">
-                  Today
-                </span>
-              )}
+          <div key={dateStr} className="space-y-5 animate-in slide-in-from-bottom-4 duration-500">
+            <div className="flex items-center gap-4 px-2">
+              <div className={`h-10 w-10 flex flex-col items-center justify-center rounded-2xl shadow-sm ${
+                isToday(date) ? 'bg-indigo-600 text-white shadow-indigo-200' : 'bg-white text-slate-900'
+              }`}>
+                <span className="text-[10px] font-black uppercase leading-none opacity-60">{format(date, 'MMM')}</span>
+                <span className="text-lg font-black leading-tight">{format(date, 'dd')}</span>
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-slate-900 tracking-tight">
+                  {format(date, 'EEEE', { locale: zhTW })}
+                </h3>
+                {isToday(date) && (
+                  <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500">Today Priority</span>
+                )}
+              </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1">
               {dayEvents.map(event => (
                 <div
                   key={event.id}
-                  className={`group relative bg-white border rounded-2xl p-5 shadow-sm hover:shadow-md transition-all border-l-4 ${
-                    event.isCompleted ? 'border-l-emerald-400 bg-slate-50/50' : 'border-l-primary'
+                  className={`glass-card group relative rounded-[1.5rem] p-6 transition-all duration-300 active:scale-[0.99] ${
+                    event.isCompleted ? 'opacity-60 grayscale-[0.5]' : ''
                   }`}
                 >
-                  <div className="flex gap-4">
+                  <div className="flex gap-5">
                     {/* Checkbox */}
                     <button
                       onClick={() => onToggleComplete(event.id, event.isCompleted)}
-                      className={`shrink-0 mt-1 transition-colors ${
-                        event.isCompleted ? 'text-emerald-500' : 'text-slate-300 hover:text-primary'
+                      className={`shrink-0 mt-0.5 transition-all duration-300 hover:scale-110 ${
+                        event.isCompleted ? 'text-emerald-500' : 'text-slate-300 hover:text-indigo-500'
                       }`}
                     >
-                      {event.isCompleted ? <CheckCircle2 className="w-6 h-6 fill-emerald-50" /> : <Circle className="w-6 h-6" />}
+                      {event.isCompleted ? (
+                        <CheckCircle2 className="w-7 h-7 fill-emerald-50" />
+                      ) : (
+                        <Circle className="w-7 h-7 stroke-[1.5]" />
+                      )}
                     </button>
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <h4 className={`font-bold text-lg leading-tight truncate ${
-                        event.isCompleted ? 'text-slate-400 line-through decoration-2' : 'text-slate-800'
-                      }`}>
-                        {event.title}
-                      </h4>
-                      
-                      <div className="flex items-center gap-3 mt-2">
-                        {event.isAllDay ? (
-                          <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded uppercase tracking-tighter">全天</span>
-                        ) : (
-                          <div className={`flex items-center gap-1 font-bold text-sm ${event.isCompleted ? 'text-slate-400' : 'text-primary'}`}>
-                            <Clock className="w-3.5 h-3.5" />
-                            <span>{event.startTime} - {event.endTime}</span>
-                          </div>
-                        )}
+                      <div className="flex items-start justify-between gap-4">
+                        <h4 className={`font-black text-xl leading-snug tracking-tight transition-all ${
+                          event.isCompleted ? 'text-slate-400 line-through decoration-2' : 'text-slate-800'
+                        }`}>
+                          {event.title}
+                        </h4>
                       </div>
-
+                      
                       {event.description && (
-                        <p className={`text-sm mt-3 line-clamp-2 ${event.isCompleted ? 'text-slate-300' : 'text-slate-500'}`}>
+                        <p className={`text-base mt-2 font-medium leading-relaxed line-clamp-2 ${
+                          event.isCompleted ? 'text-slate-300' : 'text-slate-500'
+                        }`}>
                           {event.description}
                         </p>
                       )}
                     </div>
                   </div>
 
-                  {/* Actions (Floating on hover) */}
-                  <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {/* Hover Actions */}
+                  <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0">
                     <button
                       onClick={() => onEventClick(event)}
-                      className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-primary transition-colors"
+                      className="p-2.5 bg-white/80 hover:bg-white rounded-xl text-slate-400 hover:text-indigo-600 shadow-sm border border-slate-100 transition-all"
                       title="編輯"
                     >
-                      <Edit2 className="w-4 h-4" />
+                      <Edit3 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => onDeleteEvent(event)}
-                      className="p-2 hover:bg-destructive/10 rounded-lg text-slate-400 hover:text-destructive transition-colors"
+                      className="p-2.5 bg-white/80 hover:bg-rose-50 rounded-xl text-slate-400 hover:text-rose-500 shadow-sm border border-slate-100 transition-all"
                       title="刪除"
                     >
                       <Trash2 className="w-4 h-4" />
