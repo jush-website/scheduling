@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export const eventSchema = z.object({
-  title: z.string().min(1, "行程標題為必填"),
-  date: z.string().min(1, "日期為必填"),
-  isAllDay: z.boolean(),
+  title: z.string().min(1, "Title is required"),
+  startDate: z.string().min(1, "Start date is required"),
+  targetDate: z.string().min(1, "Target date is required"),
   description: z.string().optional(),
 });
 

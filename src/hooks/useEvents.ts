@@ -27,7 +27,6 @@ export const useEvents = () => {
     }
 
     setLoading(true);
-    // 移除 orderBy 以避免索引未建立導致的資料消失，改在本地端排序
     const q = query(
       collection(db, 'events'),
       where('userId', '==', user.uid)
@@ -37,11 +36,16 @@ export const useEvents = () => {
       (snapshot) => {
         const eventList: CalendarEvent[] = [];
         snapshot.forEach((doc) => {
-          eventList.push({ id: doc.id, ...doc.data() } as CalendarEvent);
+          const data = doc.data();
+          eventList.push({ 
+            id: doc.id, 
+            ...data,
+            date: data.targetDate // Map targetDate to date for calendar compatibility
+          } as CalendarEvent);
         });
         
-        // 本地排序：日期由舊到新
-        const sortedList = eventList.sort((a, b) => a.date.localeCompare(b.date));
+        // Sorting: Latest Target Date at the top, 1st at the bottom
+        const sortedList = eventList.sort((a, b) => b.targetDate.localeCompare(a.targetDate));
         
         setEvents(sortedList);
         setLoading(false);
@@ -59,7 +63,6 @@ export const useEvents = () => {
     if (!user) return;
     await addDoc(collection(db, 'events'), {
       ...eventData,
-      isAllDay: true, // 強制全天
       isCompleted: false,
       userId: user.uid,
       createdAt: serverTimestamp()

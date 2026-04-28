@@ -9,12 +9,11 @@ export interface CalendarEvent {
   userId: string;
   title: string;
   description?: string;
-  date: string; // YYYY-MM-DD
-  isAllDay: boolean;
-  isCompleted: boolean; // 新增狀態
-  startTime?: string; // HH:mm
-  endTime?: string; // HH:mm
+  startDate: string; // YYYY-MM-DD
+  targetDate: string; // YYYY-MM-DD
+  isCompleted: boolean;
   createdAt: any;
+  date: string; // Added for backward compatibility with calendar views (mapping to targetDate)
 }
 
-export type EventFormData = Omit<CalendarEvent, 'id' | 'userId' | 'createdAt' | 'isCompleted'>;
+export type EventFormData = Omit<CalendarEvent, 'id' | 'userId' | 'createdAt' | 'isCompleted' | 'date'>;
