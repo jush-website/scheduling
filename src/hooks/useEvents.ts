@@ -18,6 +18,7 @@ export const useEvents = () => {
   const { user } = useAuth();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -27,6 +28,9 @@ export const useEvents = () => {
     }
 
     setLoading(true);
+    setError(null);
+
+    // Simple query to avoid index issues
     const q = query(
       collection(db, 'events'),
       where('userId', '==', user.uid)
@@ -40,23 +44,30 @@ export const useEvents = () => {
           eventList.push({ 
             id: doc.id, 
             ...data,
-            date: data.targetDate // Map targetDate to date for calendar compatibility
+            date: data.targetDate 
           } as CalendarEvent);
         });
         
-        // Sorting: Latest Target Date at the top, 1st at the bottom
         const sortedList = eventList.sort((a, b) => b.targetDate.localeCompare(a.targetDate));
-        
         setEvents(sortedList);
         setLoading(false);
       },
-      (error) => {
-        console.error("Firestore error:", error);
+      (err) => {
+        console.error("Firestore error:", err);
+        setError(err.message);
         setLoading(false);
       }
     );
 
-    return () => unsubscribe();
+    // Safety timeout: if no data in 10 seconds, stop loading
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 10000);
+
+    return () => {
+      unsubscribe();
+      clearTimeout(timeout);
+    };
   }, [user]);
 
   const addEvent = async (eventData: EventFormData) => {
@@ -90,5 +101,5 @@ export const useEvents = () => {
     await deleteDoc(eventRef);
   };
 
-  return { events, loading, addEvent, updateEvent, deleteEvent, toggleComplete };
+  return { events, loading, error, addEvent, updateEvent, deleteEvent, toggleComplete };
 };

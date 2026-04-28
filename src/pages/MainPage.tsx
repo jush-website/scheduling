@@ -8,12 +8,12 @@ import { EventForm } from '../components/form/EventForm';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import type { CalendarEvent } from '../types';
 import { format, addMonths, subMonths } from '../utils/date';
-import { ChevronLeft, ChevronRight, X, Plus, Calendar as CalendarIcon, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Plus, Calendar as CalendarIcon, Loader2, AlertCircle } from 'lucide-react';
 import { useEvents } from '../hooks/useEvents';
 
 export const MainPage: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const { events, loading: eventsLoading, addEvent, updateEvent, deleteEvent, toggleComplete } = useEvents();
+  const { events, loading: eventsLoading, error: eventsError, addEvent, updateEvent, deleteEvent, toggleComplete } = useEvents();
   
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
@@ -128,6 +128,13 @@ export const MainPage: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {eventsError && (
+          <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl text-rose-600 text-xs font-bold flex items-center gap-3">
+            <AlertCircle className="w-4 h-4" />
+            <span>Connection Error: {eventsError}. Please check your internet or Firebase permissions.</span>
+          </div>
+        )}
 
         {eventsLoading ? (
           <div className="flex flex-col items-center justify-center py-32 gap-4">
