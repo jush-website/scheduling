@@ -89,7 +89,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
                         e.stopPropagation();
                         onEventClick(event);
                       }}
-                      className={`relative px-1.5 h-5 flex items-center text-[8px] font-black truncate transition-all ${colorClass} ${
+                      className={`relative px-1.5 h-4 flex items-center text-[8px] font-black truncate transition-all ${colorClass} ${
                         !isStart && !isEnd ? 'rounded-none' : 'rounded-md'
                       } ${isStart ? 'rounded-r-none' : ''} ${isEnd ? 'rounded-l-none' : ''}`}
                     >

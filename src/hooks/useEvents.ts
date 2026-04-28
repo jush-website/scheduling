@@ -90,8 +90,13 @@ export const useEvents = () => {
 
   const toggleComplete = async (id: string, currentStatus: boolean) => {
     const eventRef = doc(db, 'events', id);
+    
+    // 使用本地日期格式 YYYY-MM-DD
     const now = new Date();
-    const todayStr = now.toISOString().split('T')[0];
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const todayStr = `${year}-${month}-${day}`;
     
     await updateDoc(eventRef, {
       isCompleted: !currentStatus,
