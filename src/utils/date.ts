@@ -8,7 +8,10 @@ import {
   isSameMonth, 
   isSameDay, 
   addMonths, 
-  subMonths 
+  subMonths,
+  parseISO,
+  isBefore,
+  startOfDay
 } from 'date-fns';
 
 export const getMonthDays = (date: Date) => {
@@ -23,4 +26,13 @@ export const getMonthDays = (date: Date) => {
   });
 };
 
-export { format, isSameMonth, isSameDay, addMonths, subMonths };
+export { 
+  format, 
+  isSameMonth, 
+  isSameDay, 
+  addMonths, 
+  subMonths, 
+  parseISO, 
+  isBefore, 
+  startOfDay 
+};
