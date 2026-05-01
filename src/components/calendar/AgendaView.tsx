@@ -17,8 +17,6 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
   onToggleComplete,
   onDeleteEvent
 }) => {
-  const sortedEvents = [...events].sort((a, b) => b.targetDate.localeCompare(a.targetDate));
-
   const getStatus = (event: CalendarEvent) => {
     if (event.isCompleted) return { label: '已完成', color: 'text-emerald-500 bg-emerald-50' };
     
@@ -31,7 +29,7 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
     return { label: `剩餘 ${diff} 天`, color: 'text-indigo-500 bg-indigo-50', icon: Clock };
   };
 
-  if (sortedEvents.length === 0) {
+  if (events.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-slate-400 bg-white/20 border-2 border-dashed border-slate-200 rounded-[2rem]">
         <CalendarDays className="w-8 h-8 opacity-20 mb-2" />
@@ -42,7 +40,7 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
 
   return (
     <div className="space-y-4">
-      {sortedEvents.map(event => {
+      {events.map(event => {
         const status = getStatus(event);
         const StatusIcon = status.icon;
 
