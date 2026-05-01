@@ -65,7 +65,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
                 </span>
               </div>
               
-              <div className="space-y-1 overflow-visible px-0 relative z-10">
+              <div className="space-y-0.5 overflow-visible px-0 relative z-10">
                 {dayEvents.slice(0, 4).map(event => {
                   const isStart = event.startDate === dayStr;
                   const isEnd = event.targetDate === dayStr;
@@ -92,7 +92,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
                         e.stopPropagation();
                         onEventClick(event);
                       }}
-                      className={`relative px-1 h-4 flex items-center text-[7px] md:text-[8px] font-black truncate transition-all ${colorClass} ${
+                      className={`relative px-1.5 h-5 flex items-center text-[9px] md:text-[10px] font-black truncate transition-all ${colorClass} ${
                         !isStart && !isEnd ? 'rounded-none' : 'rounded-sm'
                       } ${isStart ? 'rounded-r-none' : ''} ${isEnd ? 'rounded-l-none' : ''}`}
                     >
